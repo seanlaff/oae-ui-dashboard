@@ -61,21 +61,13 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
         var url6 = '/api/following/' + widgetData.context.id + '/followers';
 
 
-        //$.getJSON(url1, function(data) { console.log(data);});
         $.getJSON(url1, function(result) { 
-            //console.log(result);
             arrayFollowing = result.results;
             for(i = 0; i < arrayFollowing.length; i++) {
                 h1.nodes.push(arrayFollowing[i]);
             }
-          
-            
-            console.log(h1);
             h2 = JSON.stringify(h1);
-            console.log(h2);
-            //graph = JSON.parse(h2);
             graph = h1;
-            console.log(graph);
             loadMe();
         });
 
@@ -147,7 +139,6 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Discussions";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
-                console.log(arrayHistObj);
                 runVis2();
             });
         }
@@ -179,8 +170,6 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                   .nodes(graph.nodes)
                   .links(graph.links)
                   .start();
-
-                  console.log(force);
 
               var link = svg.selectAll(".link")
                   .data(graph.links)
@@ -218,7 +207,6 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
 
               circle_holds.each( function(d) {
                 //var bb = this.text.getBBox();
-                console.log(d3.select(this).selectAll('text'));
                 var curText = d3.select(this).select('text');
                 var curTextBB = curText.node().getBBox();
                 var curRect = d3.select(this).select('rect');
