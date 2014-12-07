@@ -213,7 +213,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                   .text(function(d) { return d.displayName; })
                   .attr("font-size", "10px")
                   .attr("text-anchor", "middle")
-                  .attr("dy", "-25px");
+                  .attr("color", "#333333")
+                  .attr("dy", "-30px");
 
               circle_holds.each( function(d) {
                 //var bb = this.text.getBBox();
@@ -221,14 +222,15 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 var curText = d3.select(this).select('text');
                 var curTextBB = curText.node().getBBox();
                 var curRect = d3.select(this).select('rect');
-                curRect.attr("x", curTextBB.x - 2)
-                  .attr("y", curTextBB.y - 2)
-                  .attr("width", curTextBB.width + 4)
-                  .attr("height", curTextBB.height + 4)
-                  .style("fill", "#ccc")
-                  .style("fill-opacity", ".3")
-                  .style("stroke", "#666")
-                  .style("stroke-width", "1.5px");
+                curRect.attr("x", curTextBB.x - 5)
+                  .attr("y", curTextBB.y - 3)
+                  .attr("width", curTextBB.width + 10)
+                  .attr("height", curTextBB.height + 6)
+                  .attr("rx", "3px")
+                  .attr("ry", "3px")                  
+                  .style("fill", "#f5f5f5")
+                  .style("stroke", "#dddddd")
+                  .style("stroke-width", "1px");
               })
 
 
