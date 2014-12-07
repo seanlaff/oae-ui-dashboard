@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
-#tasklist-container .tasklist-task-delete {
+#dashboard-container .dashboard-task-delete {
     margin: -4px 0 0 12px;
 }
 
-#tasklist-container .tasklist-task-delete i {
+#dashboard-container .dashboard-task-delete i {
     color: #FFF;
     font-size: 20px;
 }
