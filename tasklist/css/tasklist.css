@@ -64,11 +64,11 @@
 }
 
 .bar {
-  fill: steelblue;
+  fill: #08c;
 }
 
 .bar:hover {
-  fill: brown;
+  fill: #36cca0;
 }
 
 .axis {

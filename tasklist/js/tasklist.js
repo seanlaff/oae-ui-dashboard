@@ -58,6 +58,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
         var url3 = '/api/content/library/' + widgetData.context.id;
         var url4 = '/api/discussion/library/' + widgetData.context.id;
         var url5 = '/api/me';
+        var url6 = '/api/following/' + widgetData.context.id + '/followers';
+
 
         //$.getJSON(url1, function(data) { console.log(data);});
         $.getJSON(url1, function(result) { 
@@ -112,6 +114,28 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Files";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
+                getFollowing();
+            });
+        }
+
+        function getFollowing() {
+            $.getJSON(url1, function(result) {
+                numFiles = result.results.length;
+                var tmp = new histoObj();
+                tmp.name = "Following";
+                tmp.count = result.results.length;
+                arrayHistObj.push(tmp);
+                getFollowers();
+            });
+        }
+
+        function getFollowers() {
+            $.getJSON(url6, function(result) {
+                numFiles = result.results.length;
+                var tmp = new histoObj();
+                tmp.name = "Followers";
+                tmp.count = result.results.length;
+                arrayHistObj.push(tmp);
                 getDiscussions();
             });
         }
@@ -134,8 +158,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
 
         function runVis() {
 
-            var width = 320,
-                height = 320;
+            var width = 350,
+                height = 350;
 
             var color = d3.scale.category10();
 
@@ -223,8 +247,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
         function runVis2() {
 
             var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                width = 320 - margin.left - margin.right,
-                height = 320 - margin.top - margin.bottom;
+                width = 350 - margin.left - margin.right,
+                height = 350 - margin.top - margin.bottom;
 
             var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .5);
