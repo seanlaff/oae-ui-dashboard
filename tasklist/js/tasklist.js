@@ -140,13 +140,15 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
             var color = d3.scale.category10();
 
             var force = d3.layout.force()
-                .charge(-220)
-                .linkDistance(80)
+                .charge(-320)
+                .linkDistance(100)
                 .size([width, height]);
 
-            var svg = d3.select("#tasklist-container").append("svg")
+            var svg = d3.select("#followingbox").append("svg")
                 .attr("width", width)
-                .attr("height", height);
+                .attr("height", height)
+                .style("display", "block")
+                .style("margin", "0 auto");
 
             
             force
@@ -239,9 +241,11 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 .orient("left")
                 .ticks(10);
 
-            var svg = d3.select("#tasklist-container").append("svg")
+            var svg = d3.select("#actbox").append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
+                .style("display", "block")
+                .style("margin", "0 auto")
               .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
