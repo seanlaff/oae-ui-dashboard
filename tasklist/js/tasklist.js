@@ -57,6 +57,7 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
         var url2 = '/api/user/' + widgetData.context.id + '/memberships';
         var url3 = '/api/content/library/' + widgetData.context.id;
         var url4 = '/api/discussion/library/' + widgetData.context.id;
+        var url5 = '/api/me';
 
         //$.getJSON(url1, function(data) { console.log(data);});
         $.getJSON(url1, function(result) { 
@@ -65,15 +66,21 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
             for(i = 0; i < arrayFollowing.length; i++) {
                 h1.nodes.push(arrayFollowing[i]);
             }
-            console.log(arrayFollowing[0]);
-            console.log(h1.nodes);
-            h1.nodes.push(new meObj());
+          
+            
+            console.log(h1);
+            h2 = JSON.stringify(h1);
+            console.log(h2);
+            //graph = JSON.parse(h2);
+            graph = h1;
+            console.log(graph);
+            loadMe();
+        });
 
-            console.log(arrayFollowing[0]);
-            console.log(h1.nodes);
-
+        function loadMe() {
+          $.getJSON(url5, function(result) {
+            h1.nodes.push(result);
             var len = h1.nodes.length;
-            console.log(len);
             for(j = 0; j < len - 1; j++) {
                 var tempLink = new linkObj();
                 tempLink.source = j;
@@ -81,14 +88,9 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tempLink.value = 1;
                 h1.links.push(tempLink);
             }
-            console.log(h1);
-            h2 = JSON.stringify(h1);
-            console.log(h2);
-            //graph = JSON.parse(h2);
-            graph = h1;
-            console.log(graph);
             runVis();
-        });
+          });
+        }
 
         getGroups();
 
@@ -168,13 +170,21 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
 
               circle_holds.append("circle")
                   .attr("class", "node")
-                  .attr("r", 15)
+                  .attr("r", 20)
                   .style("fill", function(d) { return color(Math.floor((Math.random() * 10) + 1)); });
 
               circle_holds.append("text")
                   .text(function(d) { return d.displayName; })
                   .attr("font-size", "10px")
                   .attr("text-anchor", "middle");
+
+              circle_holds.append("svg:image")
+                  .attr("xlink:href", function(d) { return d.picture.small;})
+                  .attr("width", 32)
+                  .attr("height", 32)
+                  .attr("x", -16)
+                  .attr("y", -16)
+                  .attr("clip-path", "url(#myClip)");
 
 
               force.on("tick", function() {
