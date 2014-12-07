@@ -173,11 +173,6 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                   .attr("r", 20)
                   .style("fill", function(d) { return color(Math.floor((Math.random() * 10) + 1)); });
 
-              circle_holds.append("text")
-                  .text(function(d) { return d.displayName; })
-                  .attr("font-size", "10px")
-                  .attr("text-anchor", "middle");
-
               circle_holds.append("svg:image")
                   .attr("xlink:href", function(d) { return d.picture.small;})
                   .attr("width", 32)
@@ -185,6 +180,30 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                   .attr("x", -16)
                   .attr("y", -16)
                   .attr("clip-path", "url(#myClip)");
+
+              circle_holds.append("rect");
+
+              circle_holds.append("text")
+                  .text(function(d) { return d.displayName; })
+                  .attr("font-size", "10px")
+                  .attr("text-anchor", "middle")
+                  .attr("dy", "-25px");
+
+              circle_holds.each( function(d) {
+                //var bb = this.text.getBBox();
+                console.log(d3.select(this).selectAll('text'));
+                var curText = d3.select(this).select('text');
+                var curTextBB = curText.node().getBBox();
+                var curRect = d3.select(this).select('rect');
+                curRect.attr("x", curTextBB.x - 2)
+                  .attr("y", curTextBB.y - 2)
+                  .attr("width", curTextBB.width + 4)
+                  .attr("height", curTextBB.height + 4)
+                  .style("fill", "#ccc")
+                  .style("fill-opacity", ".3")
+                  .style("stroke", "#666")
+                  .style("stroke-width", "1.5px");
+              })
 
 
               force.on("tick", function() {
