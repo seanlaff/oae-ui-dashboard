@@ -182,10 +182,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 checkAndRun();
             });
         }
-
-
-        
-
+ 
+        var force;
 
         function runNetworkVis() {
 
@@ -194,7 +192,7 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
 
             var color = d3.scale.category10();
 
-            var force = d3.layout.force()
+            force = d3.layout.force()
                 .charge(-320)
                 .linkDistance(100)
                 .size([width, height]);
@@ -274,26 +272,26 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
               });
         }
 
-        function runHistogramVis() {
-
-            var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
                 width = 350 - margin.left - margin.right,
                 height = 350 - margin.top - margin.bottom;
 
-            var x = d3.scale.ordinal()
+        var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .5);
 
-            var y = d3.scale.linear()
+        var y = d3.scale.linear()
                 .range([height, 0]);
 
-            var xAxis = d3.svg.axis()
+        var xAxis = d3.svg.axis()
                 .scale(x)
                 .orient("bottom");
 
-            var yAxis = d3.svg.axis()
+        var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left")
                 .ticks(10);
+
+        function runHistogramVis() {
 
             var svg = d3.select("#actbox").append("svg")
                 .attr("width", width + margin.left + margin.right)
@@ -322,6 +320,7 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                   .style("text-anchor", "end")
                   .text("Frequency");
 
+                  console.log(x.rangeBand());
               svg.selectAll(".bar")
                   .data(arrayHistObj)
                 .enter().append("rect")
@@ -338,6 +337,55 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
               return d;
             }
         }
+
+        function resize() {
+          var xwidth = parseInt(d3.select('#followingbox').style('width')) - parseInt(d3.select('#followingbox').style('padding')) * 2;
+          var yheight = xwidth;
+          var svg1 = d3.select('#followingbox').select('svg')
+            .attr('width', xwidth)
+            .attr('height', yheight);
+          force.size([xwidth, yheight]);
+          force.start();
+
+          var svg2 = d3.select('#actbox').select('svg')
+            .attr('width', xwidth + margin.left + margin.right)
+            .attr('height', yheight + margin.top + margin.bottom);
+
+
+          x = d3.scale.ordinal()
+                .rangeRoundBands([0, xwidth], .5);
+
+          y = d3.scale.linear()
+                .range([yheight, 0]);
+
+          x.domain(arrayHistObj.map(function(d) { return d.name; }));
+          y.domain([0, d3.max(arrayHistObj, function(d) { return d.count; })]);
+
+          xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+          yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left")
+                .ticks(10);
+
+          svg2.select('.x.axis')
+            .attr("transform", "translate(0," + yheight + ")")
+            .call(xAxis);
+          svg2.select('.y.axis')
+            .call(yAxis);
+
+          svg2.selectAll('rect')
+            .attr("x", function(d) { return x(d.name); })
+            .attr("width", x.rangeBand())
+            .attr("y", function(d) { return y(d.count); })
+            .attr("height", function(d) { return yheight - y(d.count); });
+
+          console.log(x.rangeBand());
+        }
+
+        d3.select(window).on('resize', resize);
         
 
 
