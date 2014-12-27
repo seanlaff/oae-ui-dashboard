@@ -17,42 +17,7 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
 
     return function(uid, showSettings, widgetData) {
 
-        // The widget container
-        var $rootel = $('#' + uid);
-
-        var arrayFollowing;
-
-        function holderObj() {
-            this.nodes = [];
-            this.links = [];
-        }
-
-        function linkObj() {
-            this.s;
-            this.t;
-            this.v;
-        }
-
-        function meObj() {
-            this.displayName = "Me";
-        }
-
-        function histoObj() {
-            this.count;
-            this.name;
-        }
-
-        var arrayHistObj = [];
-
-        var h1 = new holderObj();
-        var h2;
-        var graph;
-
-        var numGroups;
-        var numFiles;
-        var numDiscussions;
-        
-
+        //Different URLs to hit the restful API
         var url1 = '/api/following/' + widgetData.context.id + '/following';
         var url2 = '/api/user/' + widgetData.context.id + '/memberships';
         var url3 = '/api/content/library/' + widgetData.context.id;
@@ -60,33 +25,103 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
         var url5 = '/api/me';
         var url6 = '/api/following/' + widgetData.context.id + '/followers';
 
+        // The widget container
+        var $rootel = $('#' + uid);
 
+        //CODE FOR FOLLOWING NETWORK GRAPH VISUALIZATION
+
+        //List of who the user is following
+        var arrayFollowing;
+
+        //Object that will contain all the links and nodes for the network vis
+        function networkHolderObj() {
+            this.nodes = [];
+            this.links = [];
+        }
+
+        //Link object for the newtork vis
+        function linkObj() {
+            this.s; //source
+            this.t; //target
+            this.v; //value
+        }
+
+        //Object for the current user to displayed in the middle of the network vis
+        function meObj() {
+            this.displayName = "Me";
+        }
+
+        //Create an object to hold all of the data we need for the network graph vis
+        var networkData = new networkHolderObj();
+        var graph;
+
+        //Load in the list of users the current user is following
         $.getJSON(url1, function(result) { 
             arrayFollowing = result.results;
             for(i = 0; i < arrayFollowing.length; i++) {
-                h1.nodes.push(arrayFollowing[i]);
+                networkData.nodes.push(arrayFollowing[i]);
             }
-            h2 = JSON.stringify(h1);
-            graph = h1;
-            loadMe();
+            graph = networkData;
+            loadMe(); //after followers have been loaded in, load the current user
         });
 
+        //Add the current user to the network graph and draw connections between the current
+        //user and all the other users that are being followed
         function loadMe() {
           $.getJSON(url5, function(result) {
-            h1.nodes.push(result);
-            var len = h1.nodes.length;
+            networkData.nodes.push(result);
+            var len = networkData.nodes.length;
             for(j = 0; j < len - 1; j++) {
                 var tempLink = new linkObj();
                 tempLink.source = j;
                 tempLink.target = len - 1;
                 tempLink.value = 1;
-                h1.links.push(tempLink);
+                networkData.links.push(tempLink);
             }
-            runVis();
+            runNetworkVis(); //after network data is ready, run the visualization
           });
         }
 
+
+        //CODE FOR HISTOGRAM VISUALIZATION
+
+        var numGroups; //# of groups current user is a member of 
+        var numFiles; //# of files current user has uploaded
+        var numDiscussions; //# of dicussions current user has created
+
+        //Object for each entry in the histogram vis
+        function histoObj() {
+            this.count;
+            this.name;
+        }
+
+        //List of all the objects in the histogram visualization
+        var arrayHistObj = [];
+
+        //Tracks which api calls have executed successfully
+        var apiCallChecker = {
+          'groups': false,
+          'files': false,
+          'following': false,
+          'followers': false,
+          'dicussions': false
+        };
+
         getGroups();
+        getFiles();
+        getFollowing();
+        getFollowers();
+        getDiscussions();
+
+        function checkAndRun() {
+          for(k in apiCallChecker) {
+            if(apiCallChecker[k] == false) {
+              console.log(k);
+              return;
+            }
+          }
+          runHistogramVis();
+        }
 
         function getGroups() {
             $.getJSON(url2, function(result) {
@@ -95,7 +130,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Groups";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
-                getFiles();
+                apiCallChecker.groups = true;
+                checkAndRun();
             });
         }
 
@@ -106,7 +142,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Files";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
-                getFollowing();
+                apiCallChecker.files = true;
+                checkAndRun();
             });
         }
 
@@ -117,7 +154,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Following";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
-                getFollowers();
+                apiCallChecker.following = true;
+                checkAndRun();
             });
         }
 
@@ -128,7 +166,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Followers";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
-                getDiscussions();
+                apiCallChecker.followers = true;
+                checkAndRun();
             });
         }
 
@@ -139,7 +178,8 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
                 tmp.name = "Discussions";
                 tmp.count = result.results.length;
                 arrayHistObj.push(tmp);
-                runVis2();
+                apiCallChecker.dicussions = true;
+                checkAndRun();
             });
         }
 
@@ -147,7 +187,7 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
         
 
 
-        function runVis() {
+        function runNetworkVis() {
 
             var width = 350,
                 height = 350;
@@ -234,7 +274,7 @@ define(['jquery', 'oae.core', './d3.min.js'], function($, oae, d3) {
               });
         }
 
-        function runVis2() {
+        function runHistogramVis() {
 
             var margin = {top: 20, right: 20, bottom: 30, left: 40},
                 width = 350 - margin.left - margin.right,
